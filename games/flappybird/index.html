@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Flappy Bird</title>
+  <style>
+    canvas {
+      display: block;
+      margin: 40px auto;
+      background: #70c5ce;
+    }
+  </style>
+</head>
+<body>
+  <h1 style="text-align:center;">Flappy Bird</h1>
+  <canvas id="gameCanvas" width="320" height="480"></canvas>
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let frames = 0;
+    const DEGREE = Math.PI / 180;
+
+    const sprite = new Image();
+    sprite.src = "https://raw.githubusercontent.com/sahidoona/sahidoona-games/main/assets/flappybird-sprite.png";
+
+    const state = {
+      current: 0,
+      getReady: 0,
+      game: 1,
+      over: 2
+    };
+
+    const bird = {
+      x: 50,
+      y: 150,
+      w: 34,
+      h: 26,
+      gravity: 0.25,
+      jump: 4.6,
+      speed: 0,
+      radius: 12,
+
+      draw() {
+        ctx.fillStyle = "#FF0";
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+        ctx.fill();
+      },
+
+      flap() {
+        this.speed = -this.jump;
+      },
+
+      update() {
+        if (state.current === state.getReady) {
+          this.y = 150;
+          this.speed = 0;
+        } else {
+          this.speed += this.gravity;
+          this.y += this.speed;
+
+          if (this.y + this.h / 2 >= canvas.height) {
+            state.current = state.over;
+          }
+        }
+      }
+    };
+
+    canvas.addEventListener("click", () => {
+      switch (state.current) {
+        case state.getReady:
+          state.current = state.game;
+          break;
+        case state.game:
+          bird.flap();
+          break;
+        case state.over:
+          state.current = state.getReady;
+          break;
+      }
+    });
+
+    function draw() {
+      ctx.fillStyle = "#70c5ce";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      bird.draw();
+    }
+
+    function update() {
+      bird.update();
+    }
+
+    function loop() {
+      update();
+      draw();
+      frames++;
+      requestAnimationFrame(loop);
+    }
+
+    loop();
+  </script>
+</body>
+</html>
